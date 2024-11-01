@@ -16,7 +16,7 @@ async function createBook(book) {
 
 	return {
 		status: true,
-		message: 'succeded',
+		message: 'succededd',
 	};
 }
 
