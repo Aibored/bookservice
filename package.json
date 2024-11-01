@@ -1,0 +1,25 @@
+{
+  "name": "bookservice",
+  "version": "1.0.0",
+  "description": "bookservice app",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aibored/bookservice.git"
+  },
+  "author": "ayberk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Aibored/bookservice/issues"
+  },
+  "homepage": "https://github.com/Aibored/bookservice#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "mysql": "^2.18.1"
+  }
+}
