@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+const util = require('util');
 
 const con = mysql.createConnection({
 	host:"localhost",
@@ -24,4 +25,17 @@ con.connect((error) => {
 	}
 });
 
-module.exports = con;
+function execSql(statement, values) {
+	return new Promise(function (res, rej) {
+		con.query(statement, values, function (err, result) {
+			if (err) rej(err);
+			else res(result);
+		});
+	});
+}
+
+
+module.exports = {
+	con,
+	execSql,
+};

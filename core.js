@@ -1,4 +1,5 @@
-const database = require('./database.js');
+const { con } = require('./database.js');
+const { execSql } = require('./database');
 
 
 async function createBook(book) {
@@ -12,11 +13,18 @@ async function createBook(book) {
 	}
 
 	let sql = 'INSERT INTO books (book_name, page_number, release_year) VALUES (?, ?, ?)';
-	await database.query(sql, [book_name, page_number, release_year]);
+	const result = await execSql(sql, [book_name, page_number, release_year]);
+
+	if (result.affectedRows === 0) {
+		return {
+			status: false,
+			message: 'couldn\'t create',
+		};
+	}
 
 	return {
 		status: true,
-		message: 'succededd',
+		message: 'succeded',
 	};
 }
 
