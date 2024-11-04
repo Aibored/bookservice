@@ -1,33 +1,13 @@
 const express = require('express');
 const cors = require('cors');
-const { execSql } = require('./database.js');
-const createBook = require('./core.js');
+const { execSql } = require('./db/database.js');
 const app = express();
+const { searchBook, deleteBook, searchID, listAll, listYear, createBook,updateBook,listOne } = require('./controller/controller.js');
 
 
 const corsOptions = {
 	origin: 'http://localhost:8081',
 };
-
-
-async function searchBook(book_name) {
-	let sql = 'SELECT `book_name` FROM books WHERE book_name = ? ';
-	const result2 = await execSql(sql, [book_name]);
-
-	if (result2.length > 0) {
-		return {
-			status: false,
-			message: 'book already exist',
-		};
-	}
-//console.log(result2);
-
-	return {
-		status: true,
-		message: 'OK',
-	};
-}
-
 
 function error(status, msg) {
 	const err = new Error(msg);
@@ -36,37 +16,36 @@ function error(status, msg) {
 }
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-
-	database.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
-		if (error) throw error;
-		console.log({
-			error,
-			results,
-			fields,
-			result: results[0].solution,
-		});
-	});
-
-
 	res.json({ message: 'Kitap veri tabani haberlesme sistemine hos geldiniz.' });
 });
+app.get('/books', async (req, res) => {
 
-app.get('/books',async (req, res) => {
-	const bookAll = await execSql('SELECT * FROM books');
-	console.log(bookAll);
+	const bookAll = await listAll();
 
-	res.json({
-		message: 'this is books route',
-		bookAll,
-	});
+		res.json({
+			message: 'here is the full list of books we have',
+			data: bookAll.data,
+		});
+
+
 
 });
+
+
+app.get('/books/releaseyear', async (req, res) => {
+	const bookYear = await listYear();
+
+	  res.json({
+			message: bookYear.message,
+			data: bookYear.data,
+		});
+
+});
+
 
 app.post('/books', async (req, res) => {
 	const book = req.body;
@@ -81,16 +60,13 @@ app.post('/books', async (req, res) => {
 	const search = await searchBook(bookName);
 
 	if (search.status === false) {
-		console.log(search);
+
 		return res.status(409).json({ message: search.message });
 	}
 
 
 	const create = await createBook(book);
 
-	console.log({
-		create,
-	});
 
 	if (create.status === true) {
 		return res.status(200).json({ message: create.message });
@@ -103,21 +79,69 @@ app.post('/books', async (req, res) => {
 });
 
 
+app.put('/books/:id', async (req, res) => {
+	const { id } = req.params;
+	const { book_name, page_number, release_year } = req.body;
 
-app.get('/books/:id',async (req,res) => {
-	const {id} = req.params;
-	console.log(req.params);
-	const bookResult = await execSql('SELECT * FROM books WHERE id = ?', [id]);
-	console.log(bookResult);
 
-	if(bookResult.length == 0){
-		return res.status(400).json({message:'this is a invalid request'});
+	if (!req.body.book_name || !req.body.page_number || !req.body.release_year) {
+		return res.status(400).json({ message: 'try to post accurate format' });
 	}
-	res.json(bookResult);
 
+	const idsearch = await searchID(id);
+
+
+	if (idsearch.status === false) {
+		return res.status(400).json({ message: idsearch.message });
+	}
+
+	const bookUpdate = await updateBook(id, req.body);
+
+	const idsearch2 = await searchID(id);
+
+
+	if (bookUpdate.status == true) {
+		return res.status(200).json({ message:bookUpdate.message, data: idsearch2.data });
+
+	}
+	else {
+		return res.status(500).json({ message: bookUpdate.message });
+	}
+});
+
+app.delete('/books/:id', async (req, res) => {
+	const { id } = req.params;
+
+
+	const searching = await searchID(id);
+
+
+	if (searching.status === false) {
+		return res.status(400).json({ message: searching.message });
+	}
+
+	const deleteBooks = await deleteBook(id);
+
+
+	if (deleteBooks.affectedRows === 0) {
+		return res.status(400).json({ message: 'there is no book associated with this id' });
+	}
+	return res.status(200).json({ message: 'successfully deleted. here is the deleted data:', data: searching.data });
 });
 
 
+app.get('/books/:id', async (req, res) => {
+	const { id } = req.params;
+
+	const bookResult = await listOne(id);
+
+
+	if (bookResult.status == false) {
+		return res.status(400).json({ message: bookResult.message });
+	}
+	res.json(bookResult.data);
+
+});
 
 
 const PORT = process.env.PORT || 8080;
