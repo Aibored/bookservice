@@ -2,7 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const { execSql } = require('./db/database.js');
 const app = express();
-const { searchBook, deleteBook, searchID, listAll, listYear, createBook,updateBook,listOne } = require('./book_controller/controller.js');
+const {
+	searchBook,
+	deleteBook,
+	searchID,
+	listAll,
+	listYear,
+	createBook,
+	updateBook,
+	listOne,
+} = require('./book_controllers/controller.js');
 
 
 const corsOptions = {
@@ -22,30 +31,28 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
 	res.json({ message: 'Kitap veri tabani haberlesme sistemine hos geldiniz.' });
 });
+
 app.get('/books', async (req, res) => {
 
 	const bookAll = await listAll();
 
-		res.json({
-			message: 'here is the full list of books we have',
-			data: bookAll.data,
-		});
-
+	res.json({
+		message: 'here is the full list of books we have',
+		data: bookAll.data,
+	});
 
 
 });
-
 
 app.get('/books/releaseyear', async (req, res) => {
 	const bookYear = await listYear();
 
-	  res.json({
-			message: bookYear.message,
-			data: bookYear.data,
-		});
+	res.json({
+		message: bookYear.message,
+		data: bookYear.data,
+	});
 
 });
-
 
 app.post('/books', async (req, res) => {
 	const book = req.body;
@@ -78,7 +85,6 @@ app.post('/books', async (req, res) => {
 
 });
 
-
 app.put('/books/:id', async (req, res) => {
 	const { id } = req.params;
 	const { book_name, page_number, release_year } = req.body;
@@ -88,20 +94,20 @@ app.put('/books/:id', async (req, res) => {
 		return res.status(400).json({ message: 'try to post accurate format' });
 	}
 
-	const idsearch = await searchID(id);
+	const idSearch = await searchID(id);
 
 
-	if (idsearch.status === false) {
-		return res.status(400).json({ message: idsearch.message });
+	if (idSearch.status === false) {
+		return res.status(400).json({ message: idSearch.message });
 	}
 
 	const bookUpdate = await updateBook(id, req.body);
 
-	const idsearch2 = await searchID(id);
+	const idSearch2 = await searchID(id);
 
 
 	if (bookUpdate.status == true) {
-		return res.status(200).json({ message:bookUpdate.message, data: idsearch2.data });
+		return res.status(200).json({ message: bookUpdate.message, data: idSearch2.data });
 
 	}
 	else {
@@ -128,7 +134,6 @@ app.delete('/books/:id', async (req, res) => {
 	}
 	return res.status(200).json({ message: 'successfully deleted. here is the deleted data:', data: searching.data });
 });
-
 
 app.get('/books/:id', async (req, res) => {
 	const { id } = req.params;

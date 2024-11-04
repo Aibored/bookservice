@@ -15,12 +15,13 @@ async function searchBook(book_name) {
 	return {
 		status: true,
 		message: 'OK',
+		data: result2,
 	};
 }
 
-async function deleteBook(IDbook) {
+async function deleteBook(idBook) {
 
-	await execSql('DELETE FROM books WHERE id = ?', [IDbook]);
+	const result = await execSql('DELETE FROM books WHERE id = ?', [idBook]);
 
 	return {
 		status: true,
@@ -30,13 +31,13 @@ async function deleteBook(IDbook) {
 
 }
 
-async function searchID(ID) {
-	const idsearch = await execSql('SELECT * FROM books WHERE id = ?', [ID]);
+async function searchID(id) {
+	const idSearch = await execSql('SELECT * FROM books WHERE id = ?', [id]);
 
 	console.log(idsearch);
 
 
-	if (idsearch.length === 0) {
+	if (idSearch.length === 0) {
 		return {
 			status: false,
 			message: 'this id is not exist',
@@ -46,7 +47,7 @@ async function searchID(ID) {
 	return {
 		status: true,
 		message: '1 data found',
-		data: idsearch,
+		data: idSearch,
 	};
 
 }
@@ -62,16 +63,14 @@ async function listAll() {
 }
 
 async function listYear() {
-	const bookAllyear = await execSql('SELECT book_name,release_year FROM books');
+	const bookAllYear = await execSql('SELECT book_name,release_year FROM books');
 
 	return {
 		status: true,
 		message: 'this is all release years of books',
-		data: bookAllyear,
+		data: bookAllYear,
 
 	};
-
-
 }
 
 async function createBook(book) {
@@ -120,8 +119,8 @@ async function updateBook(id, book) {
 	}
 }
 
-async function listOne(IDbook) {
-	const results = await execSql('SELECT * FROM books WHERE id = ?', [IDbook]);
+async function listOne(idBook) {
+	const results = await execSql('SELECT * FROM books WHERE id = ?', [idBook]);
 
 	if(results.length==0){
 		return{
