@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { execSql } = require('./db/database.js');
 const app = express();
-const { searchBook, deleteBook, searchID, listAll, listYear, createBook,updateBook,listOne } = require('./controller/controller.js');
+const { searchBook, deleteBook, searchID, listAll, listYear, createBook,updateBook,listOne } = require('./book_controller/controller.js');
 
 
 const corsOptions = {
