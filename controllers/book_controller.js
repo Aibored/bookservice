@@ -19,6 +19,26 @@ async function searchBook(book_name) {
 	};
 }
 
+async function searchBookByAuthor(author_id){
+	let sql = 'SELECT * FROM books WHERE author_id = ? ';
+	const result2 = await execSql(sql, [author_id]);
+
+	if (result2.length === 0) {
+		return {
+			status: false,
+			message: 'could not found',
+		};
+	}
+
+
+	return {
+		status: true,
+		message: 'OK',
+		data: result2,
+	};
+
+}
+
 async function deleteBook(idBook) {
 
 	const result = await execSql('DELETE FROM books WHERE id = ?', [idBook]);
@@ -74,17 +94,17 @@ async function listYear() {
 }
 
 async function createBook(book) {
-	const { book_name, page_number, release_year } = book;
+	const { book_name, page_number, release_year, author_id } = book;
 
-	if (!book_name || !page_number || !release_year) {
+	if (!book_name || !page_number || !release_year || !author_id) {
 		return {
 			status: false,
 			message: 'failed',
 		};
 	}
 
-	let sql = 'INSERT INTO books (book_name, page_number, release_year) VALUES (?, ?, ?)';
-	const result = await execSql(sql, [book_name, page_number, release_year]);
+	let sql = 'INSERT INTO books (book_name, page_number, release_year, author_id) VALUES (?, ?, ?, ?)';
+	const result = await execSql(sql, [book_name, page_number, release_year, author_id]);
 
 	if (result.affectedRows === 0) {
 		return {
@@ -122,18 +142,28 @@ async function updateBook(id, book) {
 async function listOne(idBook) {
 	const results = await execSql('SELECT * FROM books WHERE id = ?', [idBook]);
 
-	if(results.length==0){
-		return{
+	if (results.length == 0) {
+		return {
 			status: false,
 			message: 'cannot find',
-			data:results
+			data: results,
 		};
 	}
 
 	return {
 		status: true,
 		message: 'successes',
-		data:results,
+		data: results,
+	};
+}
+
+async function listBy(param, param2) {
+	const results = await execSql(`SELECT * FROM books ORDER BY ${param} ${param2}`);
+
+	return {
+		status: true,
+		message: 'sorted by',
+		data: results,
 	};
 }
 
@@ -146,4 +176,6 @@ module.exports = {
 	createBook,
 	updateBook,
 	listOne,
+	listBy,
+	searchBookByAuthor,
 };
