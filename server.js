@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-//const path = require('path');
+const md5 = require('md5');
 const { execSql } = require('./db/database.js');
 const app = express();
 const {
@@ -25,6 +25,10 @@ const {
 	updateAuthor,
 	listAuthorBy,
 } = require('./controllers/author_controller.js');
+const { verifyUserAndPassword } = require('./auth/verify.js');
+const { verifyToken, newToken } = require('./auth/jwt.js');
+const { promisify } = require('util');
+const jwt = require('jsonwebtoken');
 
 
 const corsOptions = {
@@ -44,7 +48,21 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
+app.get('/', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	res.json({
 		status: true,
 		message: 'Kitap veri tabani haberlesme sistemine hos geldiniz.',
@@ -54,6 +72,23 @@ app.get('/', (req, res) => {
 });
 
 app.get('/books', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
+
+
 	const bookAll = await listAll();
 
 	if (!req.query.order || !req.query.by) {
@@ -79,6 +114,21 @@ app.get('/books', async (req, res) => {
 });
 
 app.get('/books/releaseyear', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const bookYear = await listYear();
 
 	res.json({
@@ -90,6 +140,21 @@ app.get('/books/releaseyear', async (req, res) => {
 });
 
 app.post('/books', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const book = req.body;
 	const bookName = book.book_name;
 	const authorId = book.author_id;
@@ -147,6 +212,21 @@ app.post('/books', async (req, res) => {
 });
 
 app.put('/books/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 	const { book_name, page_number, release_year } = req.body;
 
@@ -193,6 +273,21 @@ app.put('/books/:id', async (req, res) => {
 });
 
 app.put('/authors/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 	const { first_name, surname } = req.body;
 
@@ -236,6 +331,21 @@ app.put('/authors/:id', async (req, res) => {
 });
 
 app.delete('/books/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 
 
@@ -268,6 +378,21 @@ app.delete('/books/:id', async (req, res) => {
 });
 
 app.get('/books/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 
 	const bookResult = await listOne(id);
@@ -285,6 +410,21 @@ app.get('/books/:id', async (req, res) => {
 });
 
 app.get('/books/author/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 	const bookResult = await searchBookByAuthor(id);
 
@@ -304,6 +444,21 @@ app.get('/books/author/:id', async (req, res) => {
 });
 
 app.get('/authors', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const authorAll = await listAuthors();
 
 	if (!req.query.order || !req.query.by) {
@@ -328,6 +483,21 @@ app.get('/authors', async (req, res) => {
 });
 
 app.get('/authors/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 
 	const authorResult = await searchId(id);
@@ -348,6 +518,21 @@ app.get('/authors/:id', async (req, res) => {
 });
 
 app.post('/authors', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const author = req.body;
 
 
@@ -382,6 +567,21 @@ app.post('/authors', async (req, res) => {
 });
 
 app.delete('/authors/:id', async (req, res) => {
+	const header = req.header('Authorization');
+	const bearer = header.split(' ');
+	const token = bearer[1];
+
+	const verify = await verifyToken(token);
+
+
+	if (verify.status == false){
+		return res.json({
+			status:true,
+			data:verify
+		});
+	}
+
+
 	const { id } = req.params;
 
 
@@ -420,6 +620,36 @@ app.delete('/authors/:id', async (req, res) => {
 		message: 'successfully deleted. here is the deleted data:',
 		data: searching.data,
 	});
+});
+
+app.get('/auth/login', async (req, res) => {
+	const username = req.body.username;
+	const password = req.body.password;
+	const user = {
+		username,
+		password,
+	};
+
+	const vPass = await verifyUserAndPassword(username, password);
+
+	if (vPass.status === false) {
+		return res.status(400).json({
+			status: false,
+			message: vPass.message,
+			data: null,
+		});
+	}
+
+
+	const token = await newToken(user);
+
+	res.json({
+		status: true,
+		message: 'here is your token',
+		data: token,
+	});
+
+
 });
 
 const PORT = process.env.PORT || 8080;
