@@ -5,7 +5,8 @@ const { token } = require('mysql/lib/protocol/Auth');
 const tokenPayload = (user) => {
 	return {
 		user: user.username,
-		userid: user.user_id,
+		role_id : user.role_id,
+		user_id: user.user_id,
 	};
 };
 
@@ -27,6 +28,7 @@ async function verifyToken(token) {
 		return {
 			status: true,
 			message: 'OK',
+			role_id: decoded.role_id,
 		};
 	} catch (err) {
 		return {

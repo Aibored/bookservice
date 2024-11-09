@@ -3,11 +3,13 @@ const cors = require('cors');
 const md5 = require('md5');
 const { execSql } = require('./db/database.js');
 const app = express();
-
+const authoratize = require('./middlewares/auth.js');
 const { verifyUserAndPassword } = require('./auth/verify.js');
 const { verifyToken, newToken } = require('./auth/jwt.js');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
+const { verify } = require('jsonwebtoken');
+const roleCheck = require('./middlewares/role_check.js');
 
 
 const corsOptions = {
@@ -20,27 +22,56 @@ function error(status, msg) {
 	return err;
 }
 
+const routePermissions = [
+	{
+		path: '/books/:id',
+		method: 'get',
+		permissionId: 1,
+	},
+	{
+		path: '/author/:id',
+		method: 'get',
+		permissionId: 2,
+	},
+	{
+		path: '/books',
+		method: 'post',
+		permissionId: '3',
+	},
+];
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(async (req,res,next)=>{
-	const header = req.header('Authorization');
-	const bearer = header.split(' ');
-	const token = bearer[1];
+app.use(async (req, res, next) => {
+	console.log(req.path);
+	const auth = await authoratize(req, res);
 
-	if(req.path !== '/auth/login'){
-		const verify = await verifyToken(token);
+	const method = 'get';
+	const findRoutesByMethod = routePermissions.filter((routePermission) => routePermission?.method === method);
+	console.log({
+		findRoutesByMethod,
+	});
 
-		if (verify.status == false){
-			return res.json({
-				status:true,
-				data:verify
-			});
+
+	let findPath = {};
+	for (let routePermission of findRoutesByMethod) {
+		var routeMatcher = new RegExp(routePermission.path.replace(/:[^\s/]+/g, '([\\w-]+)'));
+		const regexFindPath = req.path.match(routeMatcher);
+		if (regexFindPath) {
+			findPath = routePermission;
+			break;
 		}
 	}
 
-	next()
+	console.log({
+		findPath,
+	});
+//	const result = auth.data;
+//	const role = await roleCheck(result,2);
+
+
+	next();
 });
 
 app.get('/', async (req, res) => {
@@ -54,18 +85,18 @@ app.get('/', async (req, res) => {
 });
 
 
-require("./routes/book.route.js")(app);
-require("./routes/author.route.js")(app);
-require("./routes/user.route.js")(app);
+require('./routes/book.route.js')(app);
+require('./routes/author.route.js')(app);
+require('./routes/user.route.js')(app);
 
-app.all('*', async(req,res)=>{
+app.all('*', async (req, res) => {
 	res.status(404).json({
-		status:false,
-		message:'this url is forbidden',
+		status: false,
+		message: 'this url is forbidden',
 		data: null,
-	})
+	});
 
-})
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
