@@ -10,7 +10,8 @@ const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const { verify } = require('jsonwebtoken');
 const roleCheck = require('./middlewares/role_check.js');
-
+const routePermissions = require('./permissions/route.permissions.js');
+const unprotectedPaths = require('./configs/unprotected.paths.js');
 
 const corsOptions = {
 	origin: 'http://localhost:8081',
@@ -22,53 +23,48 @@ function error(status, msg) {
 	return err;
 }
 
-const routePermissions = [
-	{
-		path: '/books/:id',
-		method: 'get',
-		permissionId: 1,
-	},
-	{
-		path: '/author/:id',
-		method: 'get',
-		permissionId: 2,
-	},
-	{
-		path: '/books',
-		method: 'post',
-		permissionId: '3',
-	},
-];
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(async (req, res, next) => {
-	console.log(req.path);
-	const auth = await authoratize(req, res);
+	const protectCheck = unprotectedPaths.includes(req.path);
 
-	const method = 'get';
-	const findRoutesByMethod = routePermissions.filter((routePermission) => routePermission?.method === method);
-	console.log({
-		findRoutesByMethod,
-	});
+	if (protectCheck === false) {
+		const auth = await authoratize(req, res);
 
 
-	let findPath = {};
-	for (let routePermission of findRoutesByMethod) {
-		var routeMatcher = new RegExp(routePermission.path.replace(/:[^\s/]+/g, '([\\w-]+)'));
-		const regexFindPath = req.path.match(routeMatcher);
-		if (regexFindPath) {
-			findPath = routePermission;
-			break;
+		const method = req.method;
+		const findRoutesByMethod = routePermissions.filter((routePermission) => routePermission?.method === method);
+
+
+		let findPath = {};
+		for (let routePermission of findRoutesByMethod) {
+			var routeMatcher = new RegExp(routePermission.path.replace(/:[^\s/]+/g, '([\\w-]+)'));
+			const regexFindPath = req.path.match(routeMatcher);
+			if (regexFindPath) {
+				findPath = routePermission.permissionId;
+				break;
+			}
 		}
-	}
 
-	console.log({
-		findPath,
-	});
-//	const result = auth.data;
-//	const role = await roleCheck(result,2);
+
+		const result = auth.data;
+
+		const role = await roleCheck(result, findPath);
+
+		if (role.status === 'error') {
+			return;
+		}
+		if (role.status === false) {
+			return res.status(400).json({
+				status: false,
+				message: 'you have not permission to access',
+			});
+		}
+
+
+	}
 
 
 	next();

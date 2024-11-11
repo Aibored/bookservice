@@ -1,7 +1,7 @@
 const { execSql } = require('../db/database.js');
 
 
-async function searchName(name){
+async function searchName(name) {
 
 	const nameSearch = await execSql('SELECT `first_name` FROM authors WHERE first_name = ?', [name]);
 
@@ -20,7 +20,7 @@ async function searchName(name){
 	};
 }
 
-async function searchSurname(surname){
+async function searchSurname(surname) {
 
 	const surnameSearch = await execSql('SELECT `surname` FROM authors WHERE surname = ?', [surname]);
 
@@ -39,9 +39,8 @@ async function searchSurname(surname){
 	};
 }
 
-async function searchId(id){
+async function searchId(id) {
 	const idSearch = await execSql('SELECT * FROM authors WHERE author_id = ?', [id]);
-
 
 
 	if (idSearch.length === 0) {
@@ -82,7 +81,7 @@ async function listAuthors() {
 async function createAuthor(author) {
 	const { first_name, surname } = author;
 
-	if (!first_name || !surname ) {
+	if (!first_name || !surname) {
 		return {
 			status: false,
 			message: 'failed',
@@ -90,7 +89,7 @@ async function createAuthor(author) {
 	}
 
 	let sql = 'INSERT INTO authors (first_name,surname) VALUES (?, ?)';
-	const result = await execSql(sql, [first_name,surname]);
+	const result = await execSql(sql, [first_name, surname]);
 
 	if (result.affectedRows === 0) {
 		return {
@@ -106,9 +105,9 @@ async function createAuthor(author) {
 }
 
 async function updateAuthor(id, author) {
-	const {first_name, surname } = author;
+	const { first_name, surname } = author;
 
-	const authorUp = await execSql('UPDATE authors SET first_name = ?, surname = ? WHERE author_id  = ?', [first_name,surname, id]);
+	const authorUp = await execSql('UPDATE authors SET first_name = ?, surname = ? WHERE author_id  = ?', [first_name, surname, id]);
 
 	if (authorUp.affectedRows == 1) {
 		return {
@@ -125,7 +124,7 @@ async function updateAuthor(id, author) {
 	}
 }
 
-async function listAuthorBy(param,param2){
+async function listAuthorBy(param, param2) {
 	const results = await execSql(`SELECT * FROM authors ORDER BY ${param} ${param2}`);
 
 	return {
@@ -144,4 +143,4 @@ module.exports = {
 	createAuthor,
 	updateAuthor,
 	listAuthorBy,
-}
+};

@@ -5,7 +5,7 @@ const { token } = require('mysql/lib/protocol/Auth');
 const tokenPayload = (user) => {
 	return {
 		user: user.username,
-		role_id : user.role_id,
+		role_id: user.role_id,
 		user_id: user.user_id,
 	};
 };

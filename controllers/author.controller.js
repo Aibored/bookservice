@@ -10,7 +10,7 @@ const {
 } = require('../services/author.service.js');
 const { searchBookByAuthor } = require('../services/book.service');
 
-exports.authorCreate = async (req,res)=>{
+exports.authorCreate = async (req, res) => {
 	const author = req.body;
 
 
@@ -43,7 +43,7 @@ exports.authorCreate = async (req,res)=>{
 	}
 };
 
-exports.authorList = async (req,res)=>{
+exports.authorList = async (req, res) => {
 	const authorAll = await listAuthors();
 
 	if (!req.query.order || !req.query.by) {
@@ -66,7 +66,7 @@ exports.authorList = async (req,res)=>{
 	});
 };
 
-exports.authorRead = async (req,res)=>{
+exports.authorRead = async (req, res) => {
 	const { id } = req.params;
 
 	const authorResult = await searchId(id);
@@ -86,7 +86,7 @@ exports.authorRead = async (req,res)=>{
 	});
 };
 
-exports.authorUpdate = async (req,res)=>{
+exports.authorUpdate = async (req, res) => {
 	const { id } = req.params;
 	const { first_name, surname } = req.body;
 
@@ -129,7 +129,7 @@ exports.authorUpdate = async (req,res)=>{
 	});
 };
 
-exports.authorDelete = async (req,res)=>{
+exports.authorDelete = async (req, res) => {
 	const { id } = req.params;
 
 

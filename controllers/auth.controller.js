@@ -1,17 +1,19 @@
 const { verifyUserAndPassword } = require('../auth/verify');
 const { newToken } = require('../auth/jwt');
 
-exports.authUser= async (req,res)=>{
+exports.authUser = async (req, res) => {
+	if (!req.body.username || !req.body.password) {
+		return res.status(400).json({
+			status: false,
+			message: 'try to post accurate format',
+			data: null,
+		});
+	}
+
+
 	const username = req.body.username;
 	const password = req.body.password;
- 	const role_id =  req.body.role_id;
-	 const user_id = req.body.user_id;
-	const user = {
-		username,
-		password,
-		role_id,
-		user_id
-	};
+
 
 	const vPass = await verifyUserAndPassword(username, password);
 
@@ -23,6 +25,16 @@ exports.authUser= async (req,res)=>{
 		});
 	}
 
+	const role_id = vPass.data.role_id;
+	const user_id = vPass.data.user_id;
+
+
+	const user = {
+		username,
+		password,
+		role_id,
+		user_id,
+	};
 
 	const token = await newToken(user);
 
@@ -31,4 +43,4 @@ exports.authUser= async (req,res)=>{
 		message: 'here is your token',
 		data: token,
 	});
-}
+};
