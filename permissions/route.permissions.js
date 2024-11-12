@@ -54,6 +54,11 @@ const routePermissions = [
 		method: 'DELETE',
 		permissionId: 12,
 	},
+	{
+		path: '/auth/signup',
+		method: 'POST',
+		permissionId: 1,
+	}
 ];
 
 module.exports = routePermissions;

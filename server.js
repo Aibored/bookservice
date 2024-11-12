@@ -13,6 +13,8 @@ const roleCheck = require('./middlewares/role_check.js');
 const routePermissions = require('./permissions/route.permissions.js');
 const unprotectedPaths = require('./configs/unprotected.paths.js');
 
+
+
 const corsOptions = {
 	origin: 'http://localhost:8081',
 };
