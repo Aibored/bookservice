@@ -1,7 +1,7 @@
 const { createUser, searchUser } = require('../services/user.service.js');
 const { searchBook, createBook } = require('../services/book.service');
 const { searchId } = require('../services/author.service');
-const validateRequest = require('../configs/validation.js');
+const {validateRequest,validateAuthor,validateBook} = require('../configs/validation.js');
 
 exports.userCreate = async (req,res) =>{
 	const user = req.body;
