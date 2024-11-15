@@ -1,12 +1,11 @@
 const { createUser, searchUser } = require('../services/user.service.js');
 const { searchBook, createBook } = require('../services/book.service');
 const { searchId } = require('../services/author.service');
-const {validateRequest,validateAuthor,validateBook} = require('../configs/validation.js');
+const { validateRequest, validateAuthor, validateBook } = require('../configs/validation.js');
 
-exports.userCreate = async (req,res) =>{
+exports.userCreate = async (req, res) => {
 	const user = req.body;
 	const username = user.username;
-
 
 
 	if (!user.username || !user.password || !user.role_id) {

@@ -1,4 +1,4 @@
-const unprotected =  [
+const unprotected = [
 	'/auth/login',
 ];
 
