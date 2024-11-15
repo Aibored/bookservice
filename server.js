@@ -12,7 +12,11 @@ const { verify } = require('jsonwebtoken');
 const roleCheck = require('./middlewares/role_check.js');
 const routePermissions = require('./permissions/route.permissions.js');
 const unprotectedPaths = require('./configs/unprotected.paths.js');
-
+const{
+	validateRequest,
+	validateBook,
+	validateAuthor,
+} = require('./configs/validation');
 
 
 const corsOptions = {
@@ -30,26 +34,27 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(async (req, res, next) => {
+
+	const method = req.method;
+	const findRoutesByMethod = routePermissions.filter((routePermission) => routePermission?.method === method);
+
+
+	let findPath = {};
+	let validation = null;
+	for (let routePermission of findRoutesByMethod) {
+		var routeMatcher = new RegExp(routePermission.path.replace(/:[^\s/]+/g, '([\\w-]+)'));
+		const regexFindPath = req.path.match(routeMatcher);
+		if (regexFindPath) {
+			findPath = routePermission.permissionId;
+			validation = routePermission?.validation || null;
+			break;
+		}
+	}
+
 	const protectCheck = unprotectedPaths.includes(req.path);
 
 	if (protectCheck === false) {
 		const auth = await authoratize(req, res);
-
-
-		const method = req.method;
-		const findRoutesByMethod = routePermissions.filter((routePermission) => routePermission?.method === method);
-
-
-		let findPath = {};
-		for (let routePermission of findRoutesByMethod) {
-			var routeMatcher = new RegExp(routePermission.path.replace(/:[^\s/]+/g, '([\\w-]+)'));
-			const regexFindPath = req.path.match(routeMatcher);
-			if (regexFindPath) {
-				findPath = routePermission.permissionId;
-				break;
-			}
-		}
-
 
 		const result = auth.data;
 
@@ -64,10 +69,16 @@ app.use(async (req, res, next) => {
 				message: 'you have not permission to access',
 			});
 		}
-
-
 	}
-
+	if (validation){
+		const valid = await validation(req.body);
+		if (valid.status ===false){
+			return res.status(400).json({
+				status:false,
+				message:valid.error,
+			});
+		}
+	}
 
 	next();
 });

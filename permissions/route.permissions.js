@@ -1,3 +1,4 @@
+const { validateBook, validateAuthor, validateRequest } = require('../configs/validation');
 const routePermissions = [
 	{
 		path: '/books/:id',
@@ -13,11 +14,13 @@ const routePermissions = [
 		path: '/books',
 		method: 'POST',
 		permissionId: 5,
+		validation: validateBook,
 	},
 	{
 		path: '/books/:id',
 		method: 'PUT',
 		permissionId: 7,
+		validation: validateBook,
 	},
 	{
 		path: '/books/:id',
@@ -33,6 +36,7 @@ const routePermissions = [
 		path: '/author',
 		method: 'POST',
 		permissionId: 9,
+		validation: validateAuthor,
 	},
 	{
 		path: '/author',
@@ -48,6 +52,7 @@ const routePermissions = [
 		path: '/author/:id',
 		method: 'PUT',
 		permissionId: 11,
+		validation: validateAuthor,
 	},
 	{
 		path: '/author/:id',
@@ -58,7 +63,9 @@ const routePermissions = [
 		path: '/auth/signup',
 		method: 'POST',
 		permissionId: 1,
-	}
+		validation: validateRequest,
+	},
+
 ];
 
 module.exports = routePermissions;

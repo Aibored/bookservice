@@ -17,16 +17,6 @@ exports.userCreate = async (req,res) =>{
 		});
 	}
 
-  const validate = await validateRequest(user);
-	console.log(validate);
-	if(validate.status===false){
-		return res.status(400).json({
-			status:false,
-			message:'try accurate format',
-			error: validate.error,
-		});
-	}
-
 	const search = await searchUser(username);
 
 	if (search.status === false) {
