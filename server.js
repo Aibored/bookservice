@@ -12,7 +12,7 @@ const { verify } = require('jsonwebtoken');
 const roleCheck = require('./middlewares/role_check.js');
 const routePermissions = require('./permissions/route.permissions.js');
 const unprotectedPaths = require('./configs/unprotected.paths.js');
-const{
+const {
 	validateRequest,
 	validateBook,
 	validateAuthor,
@@ -70,12 +70,12 @@ app.use(async (req, res, next) => {
 			});
 		}
 	}
-	if (validation){
+	if (validation) {
 		const valid = await validation(req.body);
-		if (valid.status ===false){
+		if (valid.status === false) {
 			return res.status(400).json({
-				status:false,
-				message:valid.error,
+				status: false,
+				message: valid.error,
 			});
 		}
 	}
