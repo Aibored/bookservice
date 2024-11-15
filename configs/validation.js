@@ -12,7 +12,7 @@ const bookSchema = Joi.object().keys({
 	book_name: Joi.string().alphanum().required(),
 	page_number: Joi.string().pattern(BOOK_REGEX).required(),
 	release_year: Joi.string().pattern(BOOK_REGEX).required(),
-	author_name: Joi.string().pattern(BOOK_REGEX).required(),
+	author_id: Joi.string().pattern(BOOK_REGEX).required(),
 });
 
 const authorSchema = Joi.object().keys({
